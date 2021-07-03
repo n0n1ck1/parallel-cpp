@@ -102,4 +102,3 @@ TEST(SpinLock, Counter) {
 
   ASSERT_EQ(counter, kIters * kThreads);
 }
-

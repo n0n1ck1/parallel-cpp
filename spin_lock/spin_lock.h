@@ -1,20 +1,20 @@
 #pragma once
-
-
+#include<atomic>
+#include<thread>
 class SpinLock {
  public:
   SpinLock() {
   }
-
   void Lock() {
-    // Your code
+    while(flag.exchange(true)) {
+      std::this_thread::yield();
+    }
   }
 
   void Unlock() {
-    // Your code
+    flag = false;
   }
 
- private:
-  // Your code
+private:
+  std::atomic<bool> flag{false};
 };
-
