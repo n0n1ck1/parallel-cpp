@@ -102,3 +102,4 @@ TEST(TicketLock, Counter) {
 
   ASSERT_EQ(counter, kIters * kThreads);
 }
+
