@@ -10,25 +10,23 @@ class HelloWorld {
  public:
   static constexpr std::string_view kHelloPrefix = "Hello, World! From thread ";
 
-  HelloWorld(size_t n_threads)
-  {
-    n = n_threads;
+  HelloWorld(size_t n_threads) : n_hellos_(n_threads){
   }
 
   void SayHello(std::ostream& os) {
-    std::mutex m;
-    for (size_t i = 0; i < n; ++i) {
-      threads.emplace_back([&]{
-        std::unique_lock<std::mutex> lock(m);
+    std::mutex mutex;
+    for (size_t i = 0; i < n_hellos_; ++i) {
+      threads_.emplace_back([&]{
+        std::unique_lock<std::mutex> lock(mutex);
         os << kHelloPrefix << std::this_thread::get_id() << '\n';
       });
     }
-    for (auto& t : threads) {
+    for (auto& t : threads_) {
       t.join();
     }
   }
 
  private:
-   size_t n;
-   std::vector<std::thread> threads;
+   const size_t n_hellos_;
+   std::vector<std::thread> threads_;
 };
