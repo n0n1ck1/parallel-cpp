@@ -15,6 +15,7 @@ class HelloWorld {
 
   void SayHello(std::ostream& os) {
     std::mutex mutex;
+    std::vector<std::thread> threads_;
     for (size_t i = 0; i < n_hellos_; ++i) {
       threads_.emplace_back([&]{
         std::unique_lock<std::mutex> lock(mutex);
@@ -28,5 +29,4 @@ class HelloWorld {
 
  private:
    const size_t n_hellos_;
-   std::vector<std::thread> threads_;
 };
