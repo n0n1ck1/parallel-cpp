@@ -1,15 +1,16 @@
 #pragma once
 #include<atomic>
 #include<thread>
+
 class TicketLock {
  public:
   TicketLock() {
   }
 
   void Lock() {
-    std::atomic<uint64_t> my_ticket;
+    int64_t my_ticket;
     my_ticket = next_.fetch_add(1);
-    while(my_ticket != now_) {
+    while (my_ticket != now_) {
       std::this_thread::yield();
     }
   }
