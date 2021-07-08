@@ -2,7 +2,8 @@
 
 #include <optional>
 #include <queue>
-
+#include <mutex>
+#include <thread>
 
 template <typename T>
 class ThreadSafeQueue {
@@ -17,6 +18,10 @@ class ThreadSafeQueue {
 
   T Pop() {
     // Your code
+    std::unique_lock<std::mutex> lock(mutex_);
+    while(queue_.empty()) {
+      std::this_thread::yield();
+    }
     auto value = queue_.front();
     queue_.pop();
     return value;
@@ -24,6 +29,7 @@ class ThreadSafeQueue {
 
   std::optional<T> TryPop() {
     // Your code
+    std::unique_lock<std::mutex> lock(mutex_);
     if (queue_.empty()) {
       return std::nullopt;
     }
@@ -36,5 +42,5 @@ class ThreadSafeQueue {
  private:
   // Your code
   std::queue<T> queue_;
+  std::mutex mutex_;
 };
-
