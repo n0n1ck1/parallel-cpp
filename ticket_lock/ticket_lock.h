@@ -8,7 +8,7 @@ class TicketLock {
   }
 
   void Lock() {
-    int64_t my_ticket;
+    uint64_t my_ticket;
     my_ticket = next_.fetch_add(1);
     while (my_ticket != now_) {
       std::this_thread::yield();
