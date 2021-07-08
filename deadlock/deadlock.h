@@ -11,22 +11,18 @@ class Deadlock {
   }
 
   void ThreadOne() {
-    left_fork_.lock();
+    std::unique_lock<std::mutex> first_lock(first_mutex_);
     std::this_thread::sleep_for(10ms);
-    right_fork_.lock();
-    left_fork_.unlock();
-    right_fork_.unlock();
+    std::unique_lock<std::mutex> second_lock(second_mutex_);
   }
 
   void ThreadTwo() {
-    right_fork_.lock();
+    std::unique_lock<std::mutex> second_lock(second_mutex_);
     std::this_thread::sleep_for(10ms);
-    left_fork_.lock();
-    right_fork_.unlock();
-    left_fork_.unlock();
+    std::unique_lock<std::mutex> first_lock(first_mutex_);
   }
 
  private:
-  std::mutex left_fork_;
-  std::mutex right_fork_;
+  std::mutex first_mutex_;
+  std::mutex second_mutex_;
 };
