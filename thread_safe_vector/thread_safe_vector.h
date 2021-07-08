@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-
+#include<mutex>
+#include<shared_mutex>
 
 template <typename T>
 class ThreadSafeVector {
@@ -10,22 +11,22 @@ class ThreadSafeVector {
   }
 
   T operator[](size_t index) const {
-    // Your code
+    std::shared_lock lock(mutex_);
     return vector_[index];
   }
 
   size_t Size() const {
-    // Your code
+    std::shared_lock lock(mutex_);
     return vector_.size();
   }
 
   void PushBack(const T& value) {
-    // Your code
+    std::unique_lock lock(mutex_);
     vector_.push_back(value);
   }
 
  private:
   // Your code
+  mutable std::shared_mutex mutex_;
   std::vector<T> vector_;
 };
-
