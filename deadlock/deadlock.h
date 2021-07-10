@@ -1,5 +1,9 @@
 #pragma once
+#include<mutex>
+#include<thread>
+#include<chrono>
 
+using namespace std::chrono_literals;
 
 class Deadlock {
  public:
@@ -7,14 +11,18 @@ class Deadlock {
   }
 
   void ThreadOne() {
-    // Your
+    std::unique_lock<std::mutex> first_lock(first_mutex_);
+    std::this_thread::sleep_for(10ms);
+    std::unique_lock<std::mutex> second_lock(second_mutex_);
   }
 
   void ThreadTwo() {
-    // Your
+    std::unique_lock<std::mutex> second_lock(second_mutex_);
+    std::this_thread::sleep_for(10ms);
+    std::unique_lock<std::mutex> first_lock(first_mutex_);
   }
 
  private:
-  // Your
+  std::mutex first_mutex_;
+  std::mutex second_mutex_;
 };
-
