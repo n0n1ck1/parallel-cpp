@@ -20,3 +20,4 @@ TEST(IsPrime, Even) {
     EXPECT_FALSE(IsPrime(i));
   }
 }
+
