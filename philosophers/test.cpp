@@ -119,3 +119,4 @@ TEST(Philosophers, Frequent4) {
   Table table = SetUpTable(4);
   Dining(&table, 1000, 1, 1);
 }
+
