@@ -1,4 +1,5 @@
 #pragma once
+
 #include<atomic>
 #include<thread>
 #include<limits>
@@ -9,12 +10,11 @@ class RWSpinLock {
   }
 
   void LockRead() {
-    // 18 446 744 073 709 551 615 = std::numertic_limits<uint64_t> - 1
-    // this way i check if counter is even or not
-    while (std::atomic_fetch_or(&counter, 1) == counter) {
+    uint64_t check_parity = counter | 1;
+    while (counter.compare_exchange_weak(check_parity, counter + 2)) {
       std::this_thread::yield();
+      check_parity = counter | 1;
     }
-    counter += 2;
   }
 
   void UnlockRead() {
@@ -22,10 +22,11 @@ class RWSpinLock {
   }
 
   void LockWrite() {
-    while (std::atomic_fetch_or(&counter, 1) == counter) {
+    uint64_t check_parity = counter | 1;
+    while (counter.compare_exchange_weak(check_parity, counter + 1)) {
       std::this_thread::yield();
+      check_parity = counter | 1;
     }
-    counter += 1;
     while (counter > 1) {
       std::this_thread::yield();
     }
