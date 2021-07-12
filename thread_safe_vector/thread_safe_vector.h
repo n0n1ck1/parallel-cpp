@@ -21,6 +21,10 @@ class ThreadSafeVector {
   }
 
   void PushBack(const T& value) {
+    if (vector_.capacity() == vector_.size()) {
+      vector_.push_back(value);
+      return;
+    }
     std::unique_lock lock(mutex_);
     vector_.push_back(value);
   }
