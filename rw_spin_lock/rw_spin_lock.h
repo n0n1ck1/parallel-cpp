@@ -10,22 +10,32 @@ class RWSpinLock {
   }
 
   void LockRead() {
-    uint64_t check_parity = counter_ | 1;
-    while (counter_.compare_exchange_weak(check_parity, counter_ + 2)) {
-      std::this_thread::yield();
-      check_parity = counter_ | 1;
+    while (true) {
+      auto loaded_counter = counter_.load();
+      if (loaded_counter & 1) {
+        std::this_thread::yield();
+        continue;
+      }
+      if (counter_.compare_exchange_weak(loaded_counter, loaded_counter + 2)) {
+        return;
+      }
     }
   }
 
   void UnlockRead() {
-    counter_ -= 2;
+    counter_.fetch_sub(2);
   }
 
   void LockWrite() {
-    uint64_t check_parity = counter_ | 1;
-    while (counter_.compare_exchange_weak(check_parity, counter_ + 1)) {
-      std::this_thread::yield();
-      check_parity = counter_ | 1;
+    while (true) {
+      auto loaded_counter = counter_.load();
+      if (loaded_counter & 1) {
+        std::this_thread::yield();
+        continue;
+      }
+      if (counter_.compare_exchange_weak(loaded_counter, loaded_counter + 1)) {
+        break;
+      }
     }
     while (counter_ > 1) {
       std::this_thread::yield();
@@ -33,7 +43,7 @@ class RWSpinLock {
   }
 
   void UnlockWrite() {
-    counter_ -= 1;
+    counter_.fetch_sub(1);
   }
 
  private:
